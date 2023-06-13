@@ -61,7 +61,7 @@ public class IndexController {
 	
 	//@PostAuthorize("hasRole('ROLE_MANAGER')")
 	//@PreAuthorize("hasRole('ROLE_MANAGER')")
-	@Secured("ROLE_MANAGER")
+//	@Secured("ROLE_MANAGER")
 	@GetMapping("/manager")
 	public @ResponseBody String manager() {
 		return "매니저 페이지입니다.";
@@ -95,4 +95,19 @@ public class IndexController {
 		userRepository.save(user);
 		return "redirect:/loginForm";
 	}
+	
+	
+	//하나의 권한만 걸어줄거면 Secured로 쓰고 여러권한줄거면 PreAuthorize쓴다.
+	@Secured("ROLE_ADMIN")//특정메서드에 role별 접근제한 걸기
+	@GetMapping("/info")
+	public @ResponseBody String info() {
+		return "개인정보";
+	}
+	
+	@PreAuthorize("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")//메서드가 실행되기 직전에 실행된다. 특정메서드에 role별 접근제한 걸기
+	@GetMapping("/data")
+	public @ResponseBody String data() {
+		return "data정보";
+	}
+	
 }

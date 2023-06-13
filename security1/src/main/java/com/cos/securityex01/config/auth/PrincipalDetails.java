@@ -44,22 +44,25 @@ public class PrincipalDetails implements UserDetails{
 	}
 
 	@Override
-	public boolean isAccountNonExpired() {
+	public boolean isAccountNonExpired() {//이계정이 만료됬니?
 		return true;
 	}
 
 	@Override
-	public boolean isAccountNonLocked() {
-		return true;
+	public boolean isAccountNonLocked() {//이 계정이 잠겼니?
+		return true;//아뇨
 	}
 
 	@Override
-	public boolean isCredentialsNonExpired() {
-		return true;
+	public boolean isCredentialsNonExpired() {//비번을 너무 오래사용했니?
+		return true;//아뇨
 	}
 
 	@Override
-	public boolean isEnabled() {
+	public boolean isEnabled() {//이 계정이 활성화 되어있니?
+		//1년동안 회원이 로그인을 안하면 휴면계정으로 하기로함
+		//user.getLoginTime
+		//현재시간-로그인시간 => 1년초과하면 return false;
 		return true;
 	}
 	

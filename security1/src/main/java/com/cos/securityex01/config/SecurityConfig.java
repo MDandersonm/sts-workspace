@@ -12,6 +12,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Configuration // IoC 빈(bean)을 등록
 @EnableWebSecurity // 필터 체인 관리 시작 어노테이션
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true) // 특정 주소 접근시 권한 및 인증을 위한 어노테이션 활성화
+//prePostEnabled: @PreAuthorize @PostAuthorize 활성화
+// securedEnabled: @Secured 활성화 .
 public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	
 	@Bean
@@ -24,7 +26,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		
 		http.csrf().disable();
 		http.authorizeRequests()
-			.antMatchers("/user/**").authenticated()
+			.antMatchers("/user/**").authenticated()//어떠한 ROLE이든 로그인되어있으면 접근가능
 			.antMatchers("/manager/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
 			//.antMatchers("/admin/**").access("hasRole('ROLE_ADMIN') and hasRole('ROLE_USER')")
 			.antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
