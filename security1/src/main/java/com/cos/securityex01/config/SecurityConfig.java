@@ -25,15 +25,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		http.csrf().disable();
 		http.authorizeRequests()
 			.antMatchers("/user/**").authenticated()
-			//.antMatchers("/admin/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
+			.antMatchers("/manager/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
 			//.antMatchers("/admin/**").access("hasRole('ROLE_ADMIN') and hasRole('ROLE_USER')")
 			.antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
 			.anyRequest().permitAll()
 		.and()
 			.formLogin()//권한이 없는 경로로 접속했을때 로그인페이지로 튕겨준다.
 			.loginPage("/loginForm")
-//			.loginProcessingUrl("/loginProc");//loginProc주소가 호출되면 시큐리티가 낚아채서 대신 로그인을 진행해준다.
-//			.defaultSuccessUrl("/");
+			.loginProcessingUrl("/loginProc")//loginProc주소가 호출되면 시큐리티가 낚아채서 대신 로그인을 진행해준다.
+//			<form action="/loginProc" method="post">이렇게 해주면 시큐리티가 알아서 로그인 해줌 컨트롤러를 만들필요없음
+			.defaultSuccessUrl("/");//성공하면 메인페이지로
 	}
 }
 

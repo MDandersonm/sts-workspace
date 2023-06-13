@@ -93,6 +93,6 @@ public class IndexController {
 		user.setPassword(encPassword);
 		user.setRole("ROLE_USER");
 		userRepository.save(user);
-		return "redirect:/";
+		return "redirect:/loginForm";
 	}
 }
