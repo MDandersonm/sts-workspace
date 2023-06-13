@@ -16,17 +16,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 //import com.cos.securityex01.config.auth.PrincipalDetails;
-//import com.cos.securityex01.model.User;
-//import com.cos.securityex01.repository.UserRepository;
+import com.cos.securityex01.model.User;
+import com.cos.securityex01.repository.UserRepository;
 
+import lombok.*;
 @Controller //View를 리턴하겠다라는것.
 public class IndexController {
-//
-//	@Autowired
-//	private UserRepository userRepository;
-//
-//	@Autowired
-//	private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@GetMapping({ "", "/" })
 	public @ResponseBody String index() {
@@ -48,38 +49,50 @@ public class IndexController {
 //
 //		return "유저 페이지입니다.";
 //	}
-//
-//	@GetMapping("/admin")
-//	public @ResponseBody String admin() {
-//		return "어드민 페이지입니다.";
-//	}
-//	
-//	//@PostAuthorize("hasRole('ROLE_MANAGER')")
-//	//@PreAuthorize("hasRole('ROLE_MANAGER')")
-//	@Secured("ROLE_MANAGER")
-//	@GetMapping("/manager")
-//	public @ResponseBody String manager() {
-//		return "매니저 페이지입니다.";
-//	}
-//
-//	@GetMapping("/login")
-//	public String login() {
-//		return "login";
-//	}
-//
-//	@GetMapping("/join")
-//	public String join() {
-//		return "join";
-//	}
-//
-//	@PostMapping("/joinProc")
-//	public String joinProc(User user) {
-//		System.out.println("회원가입 진행 : " + user);
-//		String rawPassword = user.getPassword();
-//		String encPassword = bCryptPasswordEncoder.encode(rawPassword);
-//		user.setPassword(encPassword);
-//		user.setRole("ROLE_USER");
-//		userRepository.save(user);
-//		return "redirect:/";
-//	}
+	@GetMapping("/user")
+	public @ResponseBody String user() {
+		return "user 페이지입니다.";
+	}
+
+	@GetMapping("/admin")
+	public @ResponseBody String admin() {
+		return "어드민 페이지입니다.";
+	}
+	
+	//@PostAuthorize("hasRole('ROLE_MANAGER')")
+	//@PreAuthorize("hasRole('ROLE_MANAGER')")
+	@Secured("ROLE_MANAGER")
+	@GetMapping("/manager")
+	public @ResponseBody String manager() {
+		return "매니저 페이지입니다.";
+	}
+
+	@GetMapping("/loginForm")
+	public String loginForm() {
+		return "loginForm";
+	}
+	@GetMapping("/login")
+	public @ResponseBody String login() {
+		return "login!";
+	}
+
+	@GetMapping("/joinForm")
+	public String joinForm() {
+		return "joinForm";
+	}
+	@GetMapping("/join")
+	public @ResponseBody String join() {
+		return "join!!";
+	}
+
+	@PostMapping("/joinProc")
+	public String joinProc(User user) {
+		System.out.println("회원가입 진행 : " + user);
+		String rawPassword = user.getPassword();
+		String encPassword = bCryptPasswordEncoder.encode(rawPassword);
+		user.setPassword(encPassword);
+		user.setRole("ROLE_USER");
+		userRepository.save(user);
+		return "redirect:/";
+	}
 }
