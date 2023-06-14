@@ -36,7 +36,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 			.loginPage("/loginForm")
 			.loginProcessingUrl("/loginProc")//loginProc주소가 호출되면 시큐리티가 낚아채서 대신 로그인을 진행해준다.
 //			<form action="/loginProc" method="post">이렇게 해주면 시큐리티가 알아서 로그인 해줌 컨트롤러를 만들필요없음
-			.defaultSuccessUrl("/");//성공하면 메인페이지로
+			.defaultSuccessUrl("/")//성공하면 메인페이지로
+			.and()
+			.oauth2Login()
+			.loginPage("/loginForm");//구글로그인이 완료된 뒤의 후처리가 필요함.
+		
 	}
 }
 
