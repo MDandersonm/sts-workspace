@@ -22,7 +22,7 @@ public class PrincipalDetailsService implements UserDetailsService{
 	//String username 자리는  input에서 name속성으로 지정한 명칭을 그대로 작성해줘야한다.
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		User user = userRepository.findByUsername(username);
-		System.out.println("user.getRole()"+user.getRole());
+		System.out.println("user.getRole():"+user.getRole());
 		if(user == null) {
 			return null;
 		}

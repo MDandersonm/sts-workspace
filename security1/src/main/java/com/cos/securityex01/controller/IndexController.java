@@ -7,15 +7,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-//import com.cos.securityex01.config.auth.PrincipalDetails;
+import com.cos.securityex01.config.auth.PrincipalDetails;
 import com.cos.securityex01.model.User;
 import com.cos.securityex01.repository.UserRepository;
 
@@ -28,7 +31,32 @@ public class IndexController {
 
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
-
+	
+	@GetMapping("/test/oauth/login")
+	public @ResponseBody String testOauthLogin(Authentication authentication
+			,@AuthenticationPrincipal OAuth2User oauth) {//DI의존성 주입
+		//Authentication  또는  OAuth2User 로 user객체에 접근가능
+		System.out.println("test/login===========");
+		OAuth2User oauth2User =(OAuth2User)authentication.getPrincipal();
+		System.out.println("oauth2User.getAttributes()"+ oauth2User.getAttributes());
+		System.out.println("oauth.getAttributes()"+oauth.getAttributes());
+		return "OAuth 세션 정보 확인하기";
+	}
+	
+	@GetMapping("/test/login")
+	public @ResponseBody String testTest(Authentication authentication,
+			@AuthenticationPrincipal PrincipalDetails userDetails) {	//의존성주입
+		System.out.println("test/login===========");
+		PrincipalDetails principalDetails =(PrincipalDetails)authentication.getPrincipal();
+		System.out.println("principalDetails.getUser():"+ principalDetails.getUser());
+		System.out.println("authentication.getPrincipal():"+ authentication.getPrincipal());
+		
+		System.out.println("userDetails.getUsername():"+userDetails.getUsername());
+		System.out.println("userDetails.getUser():"+userDetails.getUser());
+		//다운케스팅을 거쳐서 user오브젝트를 찾을수도있고
+		//@authentication 어노테이션을통해서도 찾을수있다 두가지방법이있는거.
+		return "세션 정보 확인하기";
+	}
 	@GetMapping({ "", "/" })
 	public @ResponseBody String index() {
 		//머스테치 기본폴더: src/main/resources/
@@ -50,7 +78,7 @@ public class IndexController {
 //		return "유저 페이지입니다.";
 //	}
 	@GetMapping("/user")
-	public @ResponseBody String user() {
+	public @ResponseBody String user(@AuthenticationPrincipal PrincipalDetails userDetails) {
 		return "user 페이지입니다.";
 	}
 
@@ -110,4 +138,17 @@ public class IndexController {
 		return "data정보";
 	}
 	
+/*
+ * 스프링시큐리티는 자기만의 세션을들고있다(시큐리티 세션)
+ * 즉 서버의 세션안에 시큐리티가관리하는 세션이 있다는말
+ * 여기 시큐리시세션에 들어갈 수 있는 타입은 authentication객체만 가능
+ * 필요할때마다 컨트롤러에서 DI가능 
+ * authentication객체안에 들어갈수잇는 타입이 2가지가있는데 하나는 userDetails 하나는 OAuth2User타입
+ * 언제 userDetails타입이 만들어지냐면 일반적인 로그인시.
+ * OAuth로그인을 하게되면 oauth2user 타입이 객체안에 들어간다
+ * 일반적으로 세션에 접근하려면 
+ * @AuthenticationPrincipal PrincipalDetails userDetails
+ * 로 받아야된다.
+ * 
+ */
 }

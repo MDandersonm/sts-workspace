@@ -1,5 +1,7 @@
 package com.cos.securityex01.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -16,4 +18,8 @@ public interface UserRepository extends JpaRepository<User, Integer>{
 	
 	// @Query(value = "select * from user", nativeQuery = true)
 	// User find마음대로();
+	
+	// SELECT * FROM user WHERE provider = ?1 and providerId = ?2
+	Optional<User> findByProviderAndProviderId(String provider, String providerId);
 }
+
