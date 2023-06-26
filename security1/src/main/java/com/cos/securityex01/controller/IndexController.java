@@ -32,31 +32,42 @@ public class IndexController {
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
+	
+	
+	@GetMapping("/test/login")
+	public @ResponseBody String testLogin(Authentication authentication,
+			@AuthenticationPrincipal PrincipalDetails userDetails) {	//의존성주입
+		System.out.println("test/login===========");
+		PrincipalDetails principalDetails =(PrincipalDetails)authentication.getPrincipal();
+		///다운케스팅을 거쳐서 user오브젝트를 찾는방법
+		System.out.println("principalDetails.getUser():"+ principalDetails.getUser());
+		System.out.println("authentication.getPrincipal():"+ authentication.getPrincipal());
+		
+		//@authentication어노테이션을 통해서 user오브젝트를 찾는 방법
+		System.out.println("userDetails.getUsername():"+userDetails.getUsername());
+		System.out.println("userDetails.getUser():"+userDetails.getUser());
+		
+		//다운케스팅을 거쳐서 user오브젝트를 찾을수도있고
+		//@authentication 어노테이션을통해서도 찾을수있다 두가지방법이있는거.
+		return "세션 정보 확인하기";
+	}
+	
 	@GetMapping("/test/oauth/login")
 	public @ResponseBody String testOauthLogin(Authentication authentication
 			,@AuthenticationPrincipal OAuth2User oauth) {//DI의존성 주입
 		//Authentication  또는  OAuth2User 로 user객체에 접근가능
 		System.out.println("test/login===========");
+		
+		//OAuth2User를 통해 user객체 가져오기
 		OAuth2User oauth2User =(OAuth2User)authentication.getPrincipal();
 		System.out.println("oauth2User.getAttributes()"+ oauth2User.getAttributes());
+		
+		//@AuthenticationPrincipal 로 user객체가져오기
 		System.out.println("oauth.getAttributes()"+oauth.getAttributes());
 		return "OAuth 세션 정보 확인하기";
 	}
 	
-	@GetMapping("/test/login")
-	public @ResponseBody String testTest(Authentication authentication,
-			@AuthenticationPrincipal PrincipalDetails userDetails) {	//의존성주입
-		System.out.println("test/login===========");
-		PrincipalDetails principalDetails =(PrincipalDetails)authentication.getPrincipal();
-		System.out.println("principalDetails.getUser():"+ principalDetails.getUser());
-		System.out.println("authentication.getPrincipal():"+ authentication.getPrincipal());
-		
-		System.out.println("userDetails.getUsername():"+userDetails.getUsername());
-		System.out.println("userDetails.getUser():"+userDetails.getUser());
-		//다운케스팅을 거쳐서 user오브젝트를 찾을수도있고
-		//@authentication 어노테이션을통해서도 찾을수있다 두가지방법이있는거.
-		return "세션 정보 확인하기";
-	}
+	
 	@GetMapping({ "", "/" })
 	public @ResponseBody String index() {
 		//머스테치 기본폴더: src/main/resources/

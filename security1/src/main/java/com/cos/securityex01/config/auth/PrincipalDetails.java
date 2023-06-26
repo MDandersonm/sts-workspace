@@ -2,9 +2,11 @@ package com.cos.securityex01.config.auth;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.cos.securityex01.model.User;
 
@@ -25,7 +27,7 @@ import lombok.Data;
 // Authentication 객체에 저장할 수 있는 유일한 타입
 @Data
 public class PrincipalDetails implements UserDetails, OAuth2User{
-
+ 
 	private User user;//콤포지션
 
 	public PrincipalDetails(User user) {
@@ -73,7 +75,8 @@ public class PrincipalDetails implements UserDetails, OAuth2User{
 		collet.add(()->{ return user.getRole();});
 		return collet;
 	}
-	
+
+
 	/* 아래 식을 람다표현식으로 표현하면 위코드가됨
 @Override
 public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -87,6 +90,19 @@ public Collection<? extends GrantedAuthority> getAuthorities() {
     return collet;
 }
 	 */
+	
+	@Override
+	public Map<String, Object> getAttributes() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 
 
 	
