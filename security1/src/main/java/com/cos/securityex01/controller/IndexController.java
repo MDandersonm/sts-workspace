@@ -32,6 +32,7 @@ public class IndexController {
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
+
 	
 	
 	@GetMapping("/test/login")
@@ -58,7 +59,7 @@ public class IndexController {
 		//Authentication  또는  OAuth2User 로 user객체에 접근가능
 		System.out.println("test/login===========");
 		
-		//OAuth2User를 통해 user객체 가져오기
+		//authentication를 통해서 OAuth2User로 다운캐스팅후 user객체 가져오기
 		OAuth2User oauth2User =(OAuth2User)authentication.getPrincipal();
 		System.out.println("oauth2User.getAttributes()"+ oauth2User.getAttributes());
 		
@@ -88,10 +89,14 @@ public class IndexController {
 //
 //		return "유저 페이지입니다.";
 //	}
+	
+	//OAuth로그인을해도 PrincipalDetails로 받을수 있고 일반로그인을 해도 PrincipalDetails로 받을수 있다.
 	@GetMapping("/user")
-	public @ResponseBody String user(@AuthenticationPrincipal PrincipalDetails userDetails) {
+	public @ResponseBody String user(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+		System.out.println("user메서드 작동 principalDetails.getUser():"+principalDetails.getUser());
 		return "user 페이지입니다.";
 	}
+	//@AuthenticationPrincipal는
 
 	@GetMapping("/admin")
 	public @ResponseBody String admin() {

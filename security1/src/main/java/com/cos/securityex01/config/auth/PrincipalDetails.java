@@ -29,10 +29,18 @@ import lombok.Data;
 public class PrincipalDetails implements UserDetails, OAuth2User{
  
 	private User user;//콤포지션
+	private Map<String, Object> attributes;
 
+	//일반로그인할때 사용하는 생성자
 	public PrincipalDetails(User user) {
 		super();
 		this.user = user;
+	}
+	
+	//오어쓰로그인할때 사용하는 생성자
+	public PrincipalDetails(User user, Map<String, Object> attributes) {
+		this.user = user;//attributes를 토대로 user오브젝트를 만들것이다.
+		this.attributes = attributes;
 	}
 	
 	@Override
@@ -93,13 +101,14 @@ public Collection<? extends GrantedAuthority> getAuthorities() {
 	
 	@Override
 	public Map<String, Object> getAttributes() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return attributes;
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
+
+//		return attributes.get("sub");// 쓰지도않을거고 안중요해서 주석처리
 		return null;
 	}
 	

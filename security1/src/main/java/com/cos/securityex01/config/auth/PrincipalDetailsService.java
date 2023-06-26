@@ -20,6 +20,7 @@ public class PrincipalDetailsService implements UserDetailsService{
 	
 	@Override
 	//String username 자리는  input에서 name속성으로 지정한 명칭을 그대로 작성해줘야한다.
+	//함수종료시 @AuthenticationPrincipal 어노테이션이 만들어진다.
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		User user = userRepository.findByUsername(username);
 		System.out.println("user.getRole():"+user.getRole());

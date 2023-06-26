@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -23,9 +24,21 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
 
 	@Autowired
 	private UserRepository userRepository;
+	
+//	@Autowired
+//	private BCryptPasswordEncoder bCryptPasswordEncoder;
+	/* 위와 같이 하면 순환참조 에러가난다.
+	SecurityConfig는 PrincipalOauth2UserService에 의존하고 있습니다.
+	왜냐하면 SecurityConfig 내에서 PrincipalOauth2UserService를 Autowired하고 있기 때문입니다.
+	반면에, PrincipalOauth2UserService는 SecurityConfig에서 생성되는 BCryptPasswordEncoder 빈에 의존하고 있습니다.
+	이로 인해 서로가 서로에게 의존하는 순환 의존성이 생성됩니다.
+	*/
+	private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(); // 직접 새 인스턴스 생성
+		
 
 	// userRequest 는 code를 받아서 accessToken을 응답 받은 객체
 	//구글로 부터 받은 userRequest데이터에 대한 후처리 되는 함수
+	//함수종료시 @AuthenticationPrincipal 어노테이션이 만들어진다.
 	@Override
 	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 		OAuth2User oAuth2User = super.loadUser(userRequest); // google의 회원 프로필 조회
@@ -42,8 +55,32 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
 		System.out.println("super.loadUser(userRequest).getAttributes() : " + super.loadUser(userRequest).getAttributes());//구글로부터 회원프로필을 받음
 		// token을 통해 응답받은 회원정보
 		System.out.println("oAuth2User : " + oAuth2User);
-		OAuth2User oath2User=  super.loadUser(userRequest);
-		return super.loadUser(userRequest);
+		
+		System.out.println("oAuth2User.getAttributes() : " + oAuth2User.getAttributes());
+		
+		//회원가입을 강제로진행
+		String provider = userRequest.getClientRegistration().getClientId();//google
+		String providerId= oAuth2User.getAttribute("sub");
+		String username = provider+"_" +providerId;
+		String password = bCryptPasswordEncoder.encode("겟인데어");
+		String email= oAuth2User.getAttribute("email");
+		String role= "Role_USER";
+		//아이디 이미 회원가입되어있는지 확인절차
+		User userEntity =userRepository.findByUsername(username);
+		if(userEntity ==null) {//중복된 아이디가 없는경우
+			userEntity=User.builder()
+					.username(username)
+					.password(password)
+					.email(email)
+					.role(role)
+					.provider(provider)
+					.providerId(providerId)
+					.build();
+			userRepository.save(userEntity);
+		}
+		
+//		return super.loadUser(userRequest);
+		return new PrincipalDetails(userEntity,oAuth2User.getAttributes());//이게 만들어져서 Athuntication객체에 들어감.
 //		return processOAuth2User(userRequest, oAuth2User);
 	}
 //
