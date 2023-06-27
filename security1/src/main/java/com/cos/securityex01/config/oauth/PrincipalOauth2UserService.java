@@ -67,8 +67,11 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
 		}else if(userRequest.getClientRegistration().getRegistrationId().equals("facebook")) {
 			System.out.println("페이스북 로그인 요청~~");
 			oAuth2UserInfo = new FaceBookUserInfo(oAuth2User.getAttributes());
+		}else if(userRequest.getClientRegistration().getRegistrationId().equals("naver")) {
+			System.out.println("네이버로그인 요청~~");
+			oAuth2UserInfo = new NaverUserInfo((Map)oAuth2User.getAttributes().get("response"));
 		}else {
-			System.out.println("우리는 구글과 페이스북만 지원합니다.");
+			System.out.println("우리는 구글과 페이스북 , 네이버 만 지원합니다.");
 		}
 		
 
