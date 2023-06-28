@@ -133,20 +133,23 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication authResult) throws IOException, ServletException {
 		System.out.println("successfulAuthentication 실행됨: 인증이완료되었다는 뜻임");
-		super.successfulAuthentication(request, response, chain, authResult);
 		
 		
 		
 		PrincipalDetails principalDetailis = (PrincipalDetails) authResult.getPrincipal();
 		
+		//RSA방식은 아니고 Hash암호방식
 		String jwtToken = JWT.create()
 				.withSubject(principalDetailis.getUsername())
-				.withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.EXPIRATION_TIME))
-				.withClaim("id", principalDetailis.getUser().getId())
+				.withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.EXPIRATION_TIME))//토큰의 유효시간(현재시간+만료시간)
+				.withClaim("id", principalDetailis.getUser().getId())//넣고싶은 키-밸류 값 이런식으로 넣어주면 됨
 				.withClaim("username", principalDetailis.getUser().getUsername())
-				.sign(Algorithm.HMAC512(JwtProperties.SECRET));
+				.sign(Algorithm.HMAC512(JwtProperties.SECRET));//시크릿값
 		
+		//사용자에게 응답할 response 헤더에 담아줌
 		response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX+jwtToken);
+		//이제 토큰을 통해서 처리하는 필터가 하나 필요하다 토큰을 통해서 중요한정보에 접근할수있게 서버는 jwt토큰이 유효한지를 판단하는 필터를 만들어야함
+		//JwtAuthorizationFilter를만든다.
 	}
 	
 }
