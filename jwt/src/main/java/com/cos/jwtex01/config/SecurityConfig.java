@@ -12,6 +12,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.filter.CorsFilter;
 
 import com.cos.jwtex01.config.jwt.JwtAuthenticationFilter;
+import com.cos.jwtex01.config.jwt.JwtAuthorizationFilter;
+import com.cos.jwtex01.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 // securedEnabled: @Secured 활성화 .
 public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	private final CorsFilter corsFilter;
+	private final UserRepository userRepository;
 	
 	@Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -44,10 +47,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		.httpBasic().disable()// 기본적인 http로그인방식 안씀( basic방식 : header에다가 authorization이라는 키값에 id,pw 담아서 인증하는 방식) -> 매번요청할떄마다 아이디랑비번 인증. 이러면 쿠키 필요없음. 암호화가안되서 중간에 노출될수 있따.
 		//그래서 우리는 authorization에 토큰을 넣어보냄 (노출된다해도 id,pw가 아니라서 위험부담이적다.)  :  bearer방식
 		.addFilter(new JwtAuthenticationFilter(authenticationManager()))//파라미터 : AuthenticationManager
+		.addFilter(new JwtAuthorizationFilter(authenticationManager(),userRepository))
 		.authorizeRequests()
-			.antMatchers("/api1/v1/user/**").access("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
-			.antMatchers("/api1/v1/manager/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
-			.antMatchers("/api1/v1/admin/**").access("hasRole('ROLE_ADMIN')")
+			.antMatchers("/api/v1/user/**").access("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
+			.antMatchers("/api/v1/manager/**").access("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
+			.antMatchers("/api/v1/admin/**").access("hasRole('ROLE_ADMIN')")
 			.anyRequest().permitAll();
 //			.and()// formlogin을 diable해놔서 이 과정이 동작안함.
 //			.formLogin()

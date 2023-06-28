@@ -19,25 +19,50 @@ import com.cos.jwtex01.config.auth.PrincipalDetails;
 import com.cos.jwtex01.model.User;
 import com.cos.jwtex01.repository.UserRepository;
 
+
+//시큐리티가 filter를 가지고 있는데 그 filter중에 BasicAuthenticationFilter라는 것이 있다.
+//권한이나 인증이 필요한 특정 주소를 요청했을때 위 필터를 무조건 타게 되어 있다.
+//만약에 권한이나 인증이 필요한 주소가 아니라면 이 필터를 안타요
+
+
 // 인가
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter{
 	
 	private UserRepository userRepository;
 	
+	public JwtAuthorizationFilter(AuthenticationManager authenticationManager) {
+		super(authenticationManager);
+		System.out.println("인증이나 권한이 필요한 주소요청이 됨");
+	}
+	 
 	public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserRepository userRepository) {
 		super(authenticationManager);
+		System.out.println("인증이나 권한이 필요한 주소요청이 됨");
 		this.userRepository = userRepository;
 	}
+	
+	//인증이나 권한이 필요한 주소요청이 있을 때 해당 필터를 타게 됨.
+	
 	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
+//		super.doFilterInternal(request, response, chain);//반드시지워야함 이걸 안지우면 응답을 두번하게(밑에 dofilter)되서 오류가남
+		System.out.println("doFilterInternal- 인증이나 권한이 필요한 주소요청이 됨");
+		
 		String header = request.getHeader(JwtProperties.HEADER_STRING);
+		
+
+		
+		//header가 있는지 확인
 		if(header == null || !header.startsWith(JwtProperties.TOKEN_PREFIX)) {
 			chain.doFilter(request, response);
                         return;
 		}
 		System.out.println("header : "+header);
+		
+		//JWT토큰을 검증을 해서 정상적인 사용자인지 확인해야함
+		
 		String token = request.getHeader(JwtProperties.HEADER_STRING)
 				.replace(JwtProperties.TOKEN_PREFIX, "");
 		
@@ -46,19 +71,25 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter{
 		String username = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(token)
 				.getClaim("username").asString();
 		
+//		username이 있다면  	서명이 정상적으로 되었다는것
 		if(username != null) {	
 			User user = userRepository.findByUsername(username);
 			
 			// 인증은 토큰 검증시 끝. 인증을 하기 위해서가 아닌 스프링 시큐리티가 수행해주는 권한 처리를 위해 
 			// 아래와 같이 토큰을 만들어서 Authentication 객체를 강제로 만들고 그걸 세션에 저장!
 			PrincipalDetails principalDetails = new PrincipalDetails(user);
+			
+			//강제로 authentication 객체를 만듦
+			//JWT토큰 서명을 통해서 서명이 정상이면 authentication객체를 만들어준다
 			Authentication authentication =
 					new UsernamePasswordAuthenticationToken(
 							principalDetails, //나중에 컨트롤러에서 DI해서 쓸 때 사용하기 편함.
 							null, // 패스워드는 모르니까 null 처리, 어차피 지금 인증하는게 아니니까!!
-							principalDetails.getAuthorities());
+							principalDetails.getAuthorities());//권한을 알려줘야함
 			
-			// 강제로 시큐리티의 세션에 접근하여 값 저장
+//			authentication객체가 실제 로그인으로 만들어진게 아니라 서명을 통한 검증으로 username이 있으면 authentication을 만들어줌
+			
+			// 강제로 시큐리티의 세션에 접근하여 authentication객체 저장
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 		}
 	

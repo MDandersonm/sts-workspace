@@ -70,6 +70,19 @@ public class RestApiController {
 		return "회원가입완료";
 	}
 	
+	@GetMapping("manager/ha")
+	public String manager(){
+		return "manager";
+	}
+	@GetMapping("user/ha")
+	public String user(){
+		return "user";
+	}
+	@GetMapping("admin/ha")
+	public String admin(){
+		return "admin";
+	}
+	
 	
 
 
